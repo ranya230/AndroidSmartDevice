@@ -40,33 +40,28 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    // new dependencies
+    implementation("androidx.compose.ui:ui:1.5.4") // Assure-toi que la version est correcte
+    implementation("androidx.compose.material:material:1.5.4")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.5.4")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
+    implementation("androidx.compose.material3:material3:1.3.1")
+    implementation("androidx.compose.foundation:foundation:1.7.8")
     implementation("androidx.compose.ui:ui:1.7.8")
     implementation("androidx.compose.material:material:1.7.8")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.7.8")
+    implementation("androidx.compose.animation:animation:1.7.8")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.activity.compose)
-    implementation("androidx.compose.material3:material3:1.3.1")
-    implementation("androidx.compose.ui:ui:1.7.8")
-    implementation("androidx.compose.foundation:foundation:1.7.8")
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation("androidx.compose.material:material-icons-extended:1.5.1")
-
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 }

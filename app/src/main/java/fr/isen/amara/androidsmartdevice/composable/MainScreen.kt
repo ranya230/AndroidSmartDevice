@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -43,7 +42,7 @@ fun MainScreen(onScanClick: () -> Unit) {
         ) {
             Text(
                 text = "AndroidSmartDevice",
-                fontSize = 24.sp,
+                fontSize = 18.sp, // Taille de l'écriture réduite
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 textAlign = TextAlign.Center,
@@ -52,7 +51,7 @@ fun MainScreen(onScanClick: () -> Unit) {
 
             Text(
                 text = "BLE Device",
-                fontSize = 12.sp,
+                fontSize = 10.sp, // Taille de l'écriture réduite
                 fontWeight = FontWeight.Light,
                 color = Color.White,
                 textAlign = TextAlign.Center,
@@ -61,7 +60,7 @@ fun MainScreen(onScanClick: () -> Unit) {
 
             Text(
                 text = "BLE Device Scanner",
-                fontSize = 40.sp,
+                fontSize = 32.sp, // Taille de l'écriture réduite
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 textAlign = TextAlign.Center,
@@ -73,38 +72,38 @@ fun MainScreen(onScanClick: () -> Unit) {
                 painter = painterResource(id = R.drawable.pic_bluetooth),
                 contentDescription = "Bluetooth Icon",
                 modifier = Modifier
-                    .size(250.dp)
+                    .size(200.dp) // Taille de l'image réduite
                     .clip(RoundedCornerShape(20.dp)),
                 contentScale = ContentScale.Crop,
             )
 
             Text(
                 text = "Discover and connect to nearby Bluetooth Low Energy devices with ease. Tap the button below to start your scanning adventure!",
-                fontSize = 22.sp,
+                fontSize = 16.sp, // Taille de l'écriture réduite
                 color = Color.White,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(16.dp)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = onScanClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(70.dp)
+                    .height(60.dp) // Taille du bouton réduite
                     .padding(horizontal = 16.dp),
                 shape = RoundedCornerShape(35.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1E88E5))
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF42A5F5)) // Bouton plus clair
             ) {
-                Text("Start Scanning", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text("Start Scanning", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = "Unleash the power of connectivity",
-                fontSize = 20.sp,
+                fontSize = 16.sp, // Taille de l'écriture réduite
                 fontWeight = FontWeight.Light,
                 color = Color.White,
                 textAlign = TextAlign.Center,
