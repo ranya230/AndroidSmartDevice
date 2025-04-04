@@ -44,7 +44,6 @@ class DeviceControlActivity : ComponentActivity() {
         val deviceName = intent.getStringExtra("DEVICE_NAME") ?: "Unknown Device"
         val deviceAddress = intent.getStringExtra("DEVICE_ADDRESS") ?: "No Address"
 
-        // Connexion à l'appareil BLE
         connectToDevice(deviceAddress)
 
         setContent {
@@ -52,13 +51,11 @@ class DeviceControlActivity : ComponentActivity() {
                 var connectionState by remember { mutableStateOf("Connecting...") }
                 var isConnecting by remember { mutableStateOf(true) }
 
-                // Effet secondaire pour simuler la connexion si besoin
                 LaunchedEffect(isConnected) {
                     if (isConnected) {
                         connectionState = "Connected to the device"
                         isConnecting = false
                     } else {
-                        // Simuler une connexion après 3 secondes pour les tests
                         Handler(Looper.getMainLooper()).postDelayed({
                             connectionState = "Connected to the device"
                             isConnecting = false
@@ -66,19 +63,16 @@ class DeviceControlActivity : ComponentActivity() {
                     }
                 }
 
-                // Interface principale
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
                             brush = Brush.verticalGradient(
-                                colors = listOf(Color(0xFF1E88E5).copy(alpha = 0.3f),
-                                    Color(0xFF42A5F5).copy(alpha = 0.5f))
+                                colors = listOf(Color(0xFF1E88E5).copy(alpha = 0.3f), Color(0xFF42A5F5).copy(alpha = 0.5f))
                             )
                         ),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Barre supérieure
                     TopAppBar(
                         title = {
                             Text(
@@ -91,9 +85,7 @@ class DeviceControlActivity : ComponentActivity() {
                         backgroundColor = Color(0xFF1E88E5)
                     )
 
-                    // Contenu principal
                     if (isConnecting) {
-                        // Affichage pendant la connexion
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -130,7 +122,6 @@ class DeviceControlActivity : ComponentActivity() {
                             )
                         }
                     } else {
-                        // Écran TPBLE avec contrôle des LEDs
                         TPBLEScreen()
                     }
                 }
@@ -144,12 +135,10 @@ class DeviceControlActivity : ComponentActivity() {
         val bluetoothAdapter = bluetoothManager.adapter
         val device = bluetoothAdapter.getRemoteDevice(deviceAddress)
 
-        // Callback pour la connexion GATT
         val gattCallback = object : BluetoothGattCallback() {
             override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
                     Log.d("BLE", "Connected to GATT server.")
-                    // Découvrir les services
                     gatt.discoverServices()
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     Log.d("BLE", "Disconnected from GATT server.")
@@ -165,20 +154,14 @@ class DeviceControlActivity : ComponentActivity() {
                 }
             }
 
-            override fun onCharacteristicChanged(
-                gatt: BluetoothGatt,
-                characteristic: BluetoothGattCharacteristic
-            ) {
-                // Traitement des notifications
+            override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
                 try {
                     if (services.isNotEmpty()) {
                         when {
-                            // Vérifier si c'est la caractéristique du bouton 1
                             services[2].characteristics[1].uuid == characteristic.uuid -> {
                                 val value = characteristic.value[0].toInt()
                                 buttonClickCount = value
                             }
-                            // Vérifier si c'est la caractéristique du bouton 3
                             services[3].characteristics[0].uuid == characteristic.uuid -> {
                                 val value = characteristic.value[0].toInt()
                                 thirdButtonClickCount = value
@@ -191,7 +174,6 @@ class DeviceControlActivity : ComponentActivity() {
             }
         }
 
-        // Connexion à l'appareil
         bluetoothGatt = device.connectGatt(this, false, gattCallback)
     }
 
@@ -219,27 +201,18 @@ class DeviceControlActivity : ComponentActivity() {
     private fun subscribeToButtonNotifications(subscribe: Boolean) {
         if (bluetoothGatt != null && services.isNotEmpty()) {
             try {
-                // S'abonner à la notification du bouton 1 (caractéristique 2 du service 3)
                 val button1Characteristic = services[2].characteristics[1]
                 bluetoothGatt?.setCharacteristicNotification(button1Characteristic, subscribe)
 
-                // Configuration du descripteur pour activer les notifications
-                val descriptor = button1Characteristic.getDescriptor(
-                    UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-                )
-                descriptor.value = if (subscribe) BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                else BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
+                val descriptor = button1Characteristic.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"))
+                descriptor.value = if (subscribe) BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE else BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
                 bluetoothGatt?.writeDescriptor(descriptor)
 
-                // Faire la même chose pour le bouton 3 (caractéristique 1 du service 4)
                 val button3Characteristic = services[3].characteristics[0]
                 bluetoothGatt?.setCharacteristicNotification(button3Characteristic, subscribe)
 
-                val descriptor3 = button3Characteristic.getDescriptor(
-                    UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-                )
-                descriptor3.value = if (subscribe) BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                else BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
+                val descriptor3 = button3Characteristic.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"))
+                descriptor3.value = if (subscribe) BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE else BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
                 bluetoothGatt?.writeDescriptor(descriptor3)
             } catch (e: Exception) {
                 Log.e("BLE", "Error subscribing to notifications: ${e.message}")
@@ -249,7 +222,6 @@ class DeviceControlActivity : ComponentActivity() {
 
     @Composable
     fun TPBLEScreen() {
-        // États pour les LEDs
         var led1State by remember { mutableStateOf(false) }
         var led2State by remember { mutableStateOf(false) }
         var led3State by remember { mutableStateOf(false) }
@@ -261,7 +233,6 @@ class DeviceControlActivity : ComponentActivity() {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Titre TPBLE
             Text(
                 text = "TPBLE",
                 fontSize = 24.sp,
@@ -270,53 +241,38 @@ class DeviceControlActivity : ComponentActivity() {
                 modifier = Modifier.padding(vertical = 16.dp)
             )
 
-            // Sous-titre LED
             Text(
-                text = "Affichage des différentes LED",
+                text = "LED Display",
                 fontSize = 16.sp,
                 color = Color.Gray,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            // Affichage des LEDs
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                // LED 1
-                LedIcon(
-                    isActive = led1State,
-                    onClick = {
-                        led1State = !led1State
-                        toggleLed(1, led1State)
-                    }
-                )
+                LedIcon(isActive = led1State, onClick = {
+                    led1State = !led1State
+                    toggleLed(1, led1State)
+                })
 
-                // LED 2
-                LedIcon(
-                    isActive = led2State,
-                    onClick = {
-                        led2State = !led2State
-                        toggleLed(2, led2State)
-                    }
-                )
+                LedIcon(isActive = led2State, onClick = {
+                    led2State = !led2State
+                    toggleLed(2, led2State)
+                })
 
-                // LED 3
-                LedIcon(
-                    isActive = led3State,
-                    onClick = {
-                        led3State = !led3State
-                        toggleLed(3, led3State)
-                    }
-                )
+                LedIcon(isActive = led3State, onClick = {
+                    led3State = !led3State
+                    toggleLed(3, led3State)
+                })
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Section d'abonnement aux notifications
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -324,14 +280,14 @@ class DeviceControlActivity : ComponentActivity() {
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = "Abonnez vous pour recevoir le nombre d'incrémentation",
+                    text = "Subscribe to receive the increment count",
                     modifier = Modifier.weight(1f),
                     fontSize = 16.sp,
                     color = Color.Gray
                 )
 
                 Text(
-                    text = "RECEVOIR",
+                    text = "RECEIVE",
                     fontSize = 14.sp,
                     color = Color.Gray,
                     modifier = Modifier.padding(end = 8.dp)
@@ -350,7 +306,6 @@ class DeviceControlActivity : ComponentActivity() {
                 )
             }
 
-            // Affichage du compteur
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -358,7 +313,7 @@ class DeviceControlActivity : ComponentActivity() {
                     .padding(horizontal = 16.dp, vertical = 16.dp)
             ) {
                 Text(
-                    text = "Nombre: $buttonClickCount",
+                    text = "Count: $buttonClickCount",
                     fontSize = 16.sp,
                     color = Color.Gray
                 )
@@ -374,11 +329,8 @@ class DeviceControlActivity : ComponentActivity() {
                 .clickable(onClick = onClick),
             contentAlignment = Alignment.Center
         ) {
-            // Utilisez vos propres ressources d'image ou ajoutez-les dans le projet
             Image(
-                painter = painterResource(
-                    id = if (isActive) R.drawable.led_on else R.drawable.led_off
-                ),
+                painter = painterResource(id = if (isActive) R.drawable.led_on else R.drawable.led_off),
                 contentDescription = "LED",
                 modifier = Modifier.size(60.dp)
             )
